@@ -5,29 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>My nice page</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.2.0/dist/css/datepicker-bs5.min.css">
 
   <link rel="stylesheet" type="text/css" href="https://unpkg.com/notie/dist/notie.min.css">
-
-
-    <style>
-      .my-footer {
-        height: 5em;
-        background-color: #163b65;
-        margin-top: 1.5em;
-        padding: 1em;
-        color: #FFFFFF;
-        font-size: 80%;
-      }
-
-      .room-image {
-        max-width: 50%;
-      }
-
-      .notie-container {
-      box-shadow: none;
-    }
-  
-    </style>
+  <link rel="stylesheet" type="text/css" href="static/css/styles.css">
 </head>
 
 <body>
@@ -105,6 +86,8 @@
 
 
 
+
+
   <button type="submit" class="btn btn-primary">Проверить Доступность</button>
 </form>
         
@@ -139,9 +122,14 @@
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js" integrity="sha384-mQ93GR66B00ZXjt0YO5KlohRA5SY2XofN4zfuZxLkoj1gXtW8ANNCe9d5Y3eG5eD" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/notie"></script>
-  <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.2.0/dist/js/datepicker-full.min.js"></script>
 
-  <script src="sweetalert2.all.min.js"></script>
+ <!-- <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <script src="sweetalert2.all.min.js"></script>!-->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.2.0/dist/js/locales/ru.js"></script>
 
 
 <script>
@@ -169,8 +157,24 @@ let attention = Prompt();
 
 document.getElementById("colorButton").addEventListener("click", function(){
 //notify("Я тебя люблю", "error")
-//notifyModal("title", "hello", "success", "confirmButton");
-attention.toast({msg: "Hello"});
+//notifyModal("Дашуня", "Люблю тебя", "warning", "от Игоря");
+let html = `
+<form id="check-availability-form" action="" method="post" novalidate class="needs-validation">
+<div class="form-row">
+<div class="col">
+<div class="form-row" id="reservation-dates-modal">
+<div class="col">
+<input disabled required class = "form-control" type="text" name="start" id="start" placeholder="Дата заезда">
+</div>
+<input disabled required class = "form-control" type="text" name="end" id="end" placeholder="Дата выезда">
+</div>
+</div>
+</div>
+</div>
+</form>
+
+`
+attention.custom({msg: html, title:"Выберите дату"});
 })
 
 const elem = document.getElementById('reservation-dates');
@@ -244,10 +248,52 @@ Swal.fire({
 })
 }
 
+async function custom(c) {
+const {
+msg = "",
+title = "",
+} = c;
+
+const { value: formValues } = await Swal.fire({
+  title: title,
+  html: msg,
+  backdrop: false,
+  focusConfirm: false,
+  showCancelButton: true,
+  willOpen: () => {
+    const elem = document.getElementById('reservation-dates-modal');
+    const rp = new DateRangePicker(elem, {
+      format: 'dd.mm.yyyy',
+      showOnFocus:true,
+      language: 'ru',
+    
+
+      })
+
+  },
+  preConfirm: () => {
+    return [
+      document.getElementById('start').value,
+      document.getElementById('end').value
+    ]
+  },
+  didOpen: () => {
+  document.getElementById('start').removeAttribute('disabled');
+  document.getElementById('end').removeAttribute('disabled');
+}
+})
+
+if (formValues) {
+  Swal.fire(JSON.stringify(formValues))
+}
+}
+
+
  return {
  toast: toast,
  succes: succes,
   error: error,
+  custom: custom,
   }
  
 }

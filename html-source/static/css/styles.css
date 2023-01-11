@@ -1,0 +1,24 @@
+
+    .my-footer {
+      height: 5em;
+      background-color: #163b65;
+      margin-top: 1.5em;
+      padding: 1em;
+      color: #FFFFFF;
+      font-size: 80%;
+    }
+     .datepicker {
+    z-index: 556;
+  }
+  .datepicker.active {
+    display: contents;
+    }
+
+
+    .room-image {
+      max-width: 50%;
+    }
+
+    .notie-container {
+    box-shadow: none;
+  }
