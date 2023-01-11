@@ -1,0 +1,59 @@
+{{template "base" .}}
+
+{{define "content"}}
+
+ <div class="container">
+    
+
+    <div class="row">
+      <div class="col-md-3"> </div>
+      <div class="col-md-6">
+        <h1 class="mt-5">Узнать о доступности</h1>
+
+ <form action="" method="get" novalidate class="needs-validation">
+
+ <div class="form-row">
+
+     <div class="col">
+  <div class="form-group">
+  <label for="start_date" class="form-label">Время Начала</label>
+  <input required type="date" class="form-control" id="start_date" name="start_date" aria-describedby="startDateHelp">
+  <div id="startDateHelp" class="form-text text-muted">Введите Ваше время заезда в формате дд-мм-гггг.</div>
+</div>
+</div>
+<div class="col">
+
+   <div class="form-group">
+    <label for="end_date" class="form-label">Время Окончания</label>
+    <input required type="date" class="form-control" id="end_date" name="end_date" aria-describedby="endDateHelp">
+    <div id="endtDateHelp" class="form-text text-muted">Введите Ваше время выезда в формате дд-мм-гггг.</div>
+  </div>
+</div>
+</div>
+
+
+
+
+
+
+
+
+  <button type="submit" class="btn btn-primary">Проверить Доступность</button>
+</form>
+        
+      </div>
+      
+    </div>
+
+{{end}}
+
+{{define "js"}}
+
+<script>
+const elem = document.getElementById('reservation-dates');
+const rangePicker = new DateRangePicker(elem,{
+format: 'DD-MM-YYYY',
+language: 'ru',
+});
+</script>
+{{end}}
