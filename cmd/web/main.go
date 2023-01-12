@@ -7,9 +7,9 @@ import (
 
 	"time"
 
-	"github.com/ProninIgorr/booking-tjk/pkg/config"
-	"github.com/ProninIgorr/booking-tjk/pkg/handlers"
-	"github.com/ProninIgorr/booking-tjk/pkg/render"
+	"github.com/ProninIgorr/booking-tjk/internal/config"
+	"github.com/ProninIgorr/booking-tjk/internal/handlers"
+	"github.com/ProninIgorr/booking-tjk/internal/render"
 	"github.com/alexedwards/scs/v2"
 )
 

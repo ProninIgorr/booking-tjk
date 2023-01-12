@@ -10,22 +10,23 @@
       <div class="col-md-6">
         <h1 class="mt-5">Узнать о доступности</h1>
 
- <form action="" method="get" novalidate class="needs-validation">
+ <form action="/search-availability" method="post" novalidate class="needs-validation">
+ <input type="hidden" name="csrf_token" value="{{.CSRFToken}}" >
 
  <div class="form-row">
 
      <div class="col">
   <div class="form-group">
-  <label for="start_date" class="form-label">Время Начала</label>
-  <input required type="date" class="form-control" id="start_date" name="start_date" aria-describedby="startDateHelp">
+  <label for="start" class="form-label">Время Начала</label>
+  <input required type="date" class="form-control" id="start" name="start" aria-describedby="startDateHelp">
   <div id="startDateHelp" class="form-text text-muted">Введите Ваше время заезда в формате дд-мм-гггг.</div>
 </div>
 </div>
 <div class="col">
 
    <div class="form-group">
-    <label for="end_date" class="form-label">Время Окончания</label>
-    <input required type="date" class="form-control" id="end_date" name="end_date" aria-describedby="endDateHelp">
+    <label for="end" class="form-label">Время Окончания</label>
+    <input required type="date" class="form-control" id="end" name="end" aria-describedby="endDateHelp">
     <div id="endtDateHelp" class="form-text text-muted">Введите Ваше время выезда в формате дд-мм-гггг.</div>
   </div>
 </div>
