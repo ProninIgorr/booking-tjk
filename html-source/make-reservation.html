@@ -71,7 +71,8 @@
       <div class="col">
         
         <h1>Забронировать номер</h1>
-        <form method="post" action="" class="needs-validation" novalidate>
+        <form method="post" action="/make-reservation" class="" novalidate>
+        <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
 
         <div class="form-group mt-5">
             <label for="first_name">Имя:</label>

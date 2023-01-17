@@ -9,26 +9,38 @@
       <div class="col">
         
         <h1>Забронировать номер</h1>
-        <form method="post" action="" class="needs-validation" novalidate>
+
+        {{$res :=index .Data "reservation"}}
+
+        
+        <form method="post" action="/make-reservation" class="" novalidate>
+        <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
 
         <div class="form-group mt-5">
             <label for="first_name">Имя:</label>
-            <input type="text" name="first_name" id="first_name" class="form-control" required autocomplete="off">
+            {{with .Form.Errors.Get "first_name"}}
+            <label class="text-danger">{{.}}</label>
+            {{end}}
+            <input type="text" name="first_name" id="first_name" class="form-control {{with .Form.Errors.Get "first_name"}} is-invalid {{end}}"
+            required value="{{$res.FirstName}}" autocomplete="off">
 
           </div>
            <div class="form-group">
             <label for="last_name">Фамилия:</label>
-            <input type="text" name="last_name" id="last_name" class="form-control"  required autocomplete="off">
+            <input type="text" name="last_name" id="last_name" class="form-control {{with .Form.Errors.Get "last_name"}} is-invalid {{end}}"
+              required value="{{$res.LastName}}"  autocomplete="off">
 
           </div>
           <div class="form-group">
             <label for="email">Email:</label>
-            <input type="email" name="email" id="email" class="form-control"  required autocomplete="off">
+            <input type="email" name="email" id="email" class="form-control {{with .Form.Errors.Get "email"}} is-invalid {{end}}"  
+            required value="{{$res.Email}}"  autocomplete="off">
 
           </div>
             <div class="form-group">
                 <label for="phone">Телефон:</label>
-                <input type="tel" name="phone" id="phone" class="form-control"  required autocomplete="off">
+                <input type="email" name="phone" id="phone" class="form-control {{with .Form.Errors.Get "phone"}} is-invalid {{end}}"  
+                required value="{{$res.Phone}}"  autocomplete="off">
                 </div>
 
                 <hr>
