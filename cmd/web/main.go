@@ -11,6 +11,7 @@ import (
 
 	"github.com/ProninIgorr/booking-tjk/helpers"
 	"github.com/ProninIgorr/booking-tjk/internal/config"
+	"github.com/ProninIgorr/booking-tjk/internal/driver"
 	"github.com/ProninIgorr/booking-tjk/internal/handlers"
 	"github.com/ProninIgorr/booking-tjk/internal/models"
 	"github.com/ProninIgorr/booking-tjk/internal/render"
@@ -25,10 +26,11 @@ var infoLog *log.Logger
 var errorLog *log.Logger
 
 func main() {
-	err := run()
+	db, err := run()
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer db.SQL.Close()
 
 	fmt.Println(fmt.Sprintf("Server is running on port %s", portNumber))
 	srv := &http.Server{
@@ -39,7 +41,7 @@ func main() {
 	log.Fatal(err)
 }
 
-func run() error {
+func run() (*driver.DB, error) {
 
 	// what am I going to put in the session
 	gob.Register(models.Reservation{})
@@ -61,19 +63,28 @@ func run() error {
 
 	app.Session = session
 
+	// connect to database
+	log.Println("Connecting to database...")
+	db, err := driver.ConnectSQl("host=localhost port=5432 dbname=booking user=postgres password=Pizdechuynya99 sslmode=disable")
+	if err != nil {
+		log.Fatal("Cannot connect to database! Dying...")
+	}
+
+	log.Println("Connected to database")
+
 	tc, err := render.CreateTemplateCache()
 	if err != nil {
 		log.Fatal("Cannot create template cache")
-		return err
+		return nil, err
 	}
 	app.TemplateCache = tc
 	app.UseCache = false
 
-	repo := handlers.NewRepo(&app)
+	repo := handlers.NewRepo(&app, db)
 	handlers.NewHandlers(repo)
 	render.NewTemplates(&app)
 	helpers.NewHelpers(&app)
 
-	return nil
+	return db, nil
 
 }
