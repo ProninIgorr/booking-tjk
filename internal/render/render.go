@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"html/template"
-	"log"
 	"net/http"
 	"path/filepath"
 
@@ -14,12 +13,13 @@ import (
 	"github.com/justinas/nosurf"
 )
 
-var app *config.AppConfig
 var functions = template.FuncMap{}
+
+var app *config.AppConfig
 var pathToTemplates = "./templates"
 
-// NewTemplates sets the config for the template package
-func NewTemplates(a *config.AppConfig) {
+// NewRender sets the config for the template package
+func NewRender(a *config.AppConfig) {
 	app = a
 }
 
@@ -30,33 +30,6 @@ func AddDefaultData(td *models.TemplateData, r *http.Request) *models.TemplateDa
 	td.Error = app.Session.PopString(r.Context(), "error")
 	td.CSRFToken = nosurf.Token(r)
 	return td
-}
-
-// RenderTemplate renders templates using html/template
-func RenderTemplate(w http.ResponseWriter, r *http.Request, tmpl string, td *models.TemplateData) error {
-	var tc map[string]*template.Template
-	if app.UseCache {
-		//get the template cache from the app config
-		tc = app.TemplateCache
-	} else {
-		tc, _ = CreateTemplateCache()
-	}
-
-	t, ok := tc[tmpl]
-	if !ok {
-		log.Fatal("Could not get template from template cache")
-	}
-	buf := new(bytes.Buffer)
-
-	td = AddDefaultData(td, r)
-
-	_ = t.Execute(buf, td)
-
-	_, err := buf.WriteTo(w)
-	if err != nil {
-		fmt.Println("Error writing template to browser", err)
-	}
-	return nil
 }
 
 // Template renders a template
