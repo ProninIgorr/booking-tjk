@@ -26,7 +26,7 @@
 
    <div class="form-group">
     <label for="end" class="form-label">Время Окончания</label>
-    <input required type="date" class="form-control" id="end" name="end" aria-describedby="endDateHelp">
+    <input required type="date"  class="form-control" id="end" name="end" aria-describedby="endDateHelp">
     <div id="endtDateHelp" class="form-text text-muted">Введите Ваше время выезда в формате дд-мм-гггг.</div>
   </div>
 </div>
@@ -55,6 +55,7 @@ const elem = document.getElementById('reservation-dates');
 const rangePicker = new DateRangePicker(elem,{
 format: 'DD-MM-YYYY',
 language: 'ru',
+minDate: new Date(),
 });
 </script>
 {{end}}

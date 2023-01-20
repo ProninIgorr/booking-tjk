@@ -8,13 +8,23 @@
     <div class="row">
       <div class="col">
         
-        <h1>Забронировать номер</h1>
-
         {{$res :=index .Data "reservation"}}
+
+        <h1>Забронировать номер</h1>
+        <p><strong>Данные о бронировании:</strong><br>
+        Номер: {{$res.Room.RoomName}}<br>
+        Въезд: {{index .StringMap "start_date"}}<br>
+        Выезд: {{index .StringMap "end_date"}}<br>
+        </p>
+
 
         
         <form method="post" action="/make-reservation" class="" novalidate>
         <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
+        <input type="hidden" name="start_date" value="{{index .StringMap "start_date"}}">
+        <input type="hidden" name="end_date" value="{{index .StringMap "end_date"}}">
+        <input type="hidden" name="room_id" value="{{$res.RoomID}}">
+
 
 
 
@@ -32,19 +42,7 @@
             <input type="text" name="last_name" id="last_name" class="form-control {{with .Form.Errors.Get "last_name"}} is-invalid {{end}}"
               required value="{{$res.LastName}}"  autocomplete="off">
 
-              <div class="form-group">
-                <label for="start_date">Въезд:</label>
-                <input type="text" name="start_date" id="start_date" class="form-control">
-                  </div>
-
-                  <div class="form-group">
-                <label for="end_date">Выезд:</label>
-                <input type="text" name="end_date" id="end_date" class="form-control">
-                </div>
-
-                <input type="hidden" name="room_id" value="1">
-
-
+              
 
           </div>
           <div class="form-group">
