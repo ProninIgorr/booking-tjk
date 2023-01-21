@@ -8,10 +8,10 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"testing"
 	"time"
 
 	"github.com/ProninIgorr/booking-tjk/internal/config"
-	"github.com/ProninIgorr/booking-tjk/internal/driver"
 	"github.com/ProninIgorr/booking-tjk/internal/models"
 	"github.com/ProninIgorr/booking-tjk/internal/render"
 	"github.com/alexedwards/scs/v2"
@@ -25,7 +25,7 @@ var session *scs.SessionManager
 var pathToTemplates = "./../../templates"
 var functions = template.FuncMap{}
 
-func getRoutes() http.Handler {
+func TestMain(m *testing.M) {
 	// what am I going to put in the session
 	gob.Register(models.Reservation{})
 
@@ -47,15 +47,6 @@ func getRoutes() http.Handler {
 
 	app.Session = session
 
-	// connect to database
-	log.Println("Connecting to database...")
-	db, err := driver.ConnectSQl("host=localhost port=5432 dbname=booking user=postgres password=Pizdechuynya99 sslmode=disable")
-	if err != nil {
-		log.Fatal("Cannot connect to database! Dying...")
-	}
-
-	log.Println("Connected to database")
-
 	tc, err := CreateTestTemplateCache()
 	if err != nil {
 		log.Fatal("cannot create template cache")
@@ -64,10 +55,16 @@ func getRoutes() http.Handler {
 	app.TemplateCache = tc
 	app.UseCache = true
 
-	repo := NewRepo(&app, db)
+	repo := NewTestRepo(&app)
 	NewHandlers(repo)
 
 	render.NewRender(&app)
+
+	os.Exit(m.Run())
+
+}
+
+func getRoutes() http.Handler {
 
 	mux := chi.NewRouter()
 
