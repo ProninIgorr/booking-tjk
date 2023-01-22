@@ -469,3 +469,62 @@ func (m *Repository) BookRoom(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/make-reservation", http.StatusSeeOther)
 
 }
+
+// ShowLogin displays the login page
+func (m *Repository) ShowLogin(w http.ResponseWriter, r *http.Request) {
+	render.Template(w, r, "login.page.tmpl", &models.TemplateData{
+		Form: forms.New(nil),
+	})
+}
+
+// PostShowLogin handles the login page
+func (m *Repository) PostShowLogin(w http.ResponseWriter, r *http.Request) {
+	_ = m.App.Session.RenewToken(r.Context())
+
+	err := r.ParseForm()
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+
+	form := forms.New(r.PostForm)
+	form.Required("email", "password")
+	form.IsEmail("email")
+
+	if !form.Valid() {
+		render.Template(w, r, "login.page.tmpl", &models.TemplateData{
+			Form: form,
+		})
+		return
+	}
+
+	email := r.Form.Get("email")
+	password := r.Form.Get("password")
+
+	id, _, err := m.DB.Authenticate(email, password)
+	if err != nil {
+		m.App.Session.Put(r.Context(), "error", "Неверный email или пароль")
+		render.Template(w, r, "login.page.tmpl", &models.TemplateData{
+			Form: form,
+		})
+		return
+	}
+
+	m.App.Session.Put(r.Context(), "user_id", id)
+	m.App.Session.Put(r.Context(), "flash", "Вы успешно вошли в систему")
+
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+// Logout logs the user out
+func (m *Repository) Logout(w http.ResponseWriter, r *http.Request) {
+	_ = m.App.Session.Destroy(r.Context())
+	_ = m.App.Session.RenewToken(r.Context())
+
+	http.Redirect(w, r, "/user/login", http.StatusSeeOther)
+}
+
+// AdminDashboard displays the admin dashboard page
+func (m *Repository) AdminDashboard(w http.ResponseWriter, r *http.Request) {
+	render.Template(w, r, "admin-dashboard.page.tmpl", &models.TemplateData{})
+}
