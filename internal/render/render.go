@@ -7,13 +7,16 @@ import (
 	"html/template"
 	"net/http"
 	"path/filepath"
+	"time"
 
 	"github.com/ProninIgorr/booking-tjk/internal/config"
 	"github.com/ProninIgorr/booking-tjk/internal/models"
 	"github.com/justinas/nosurf"
 )
 
-var functions = template.FuncMap{}
+var functions = template.FuncMap{
+	"humanDate": HumanDate,
+}
 
 var app *config.AppConfig
 var pathToTemplates = "./templates"
@@ -21,6 +24,11 @@ var pathToTemplates = "./templates"
 // NewRender sets the config for the template package
 func NewRender(a *config.AppConfig) {
 	app = a
+}
+
+// HumanDate formats a date to human readable format
+func HumanDate(t time.Time) string {
+	return t.Format("02 Jan 2006 ")
 }
 
 // AddDefaultData adds data to the template
