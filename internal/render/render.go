@@ -15,11 +15,18 @@ import (
 )
 
 var functions = template.FuncMap{
-	"humanDate": HumanDate,
+	"humanDate":  HumanDate,
+	"formatDate": FormatDate,
+	"iterate":    Iterate,
+	"add":        Add,
 }
 
 var app *config.AppConfig
 var pathToTemplates = "./templates"
+
+func Add(a, b int) int {
+	return a + b
+}
 
 // NewRender sets the config for the template package
 func NewRender(a *config.AppConfig) {
@@ -111,4 +118,19 @@ func CreateTemplateCache() (map[string]*template.Template, error) {
 	}
 
 	return myCache, nil
+}
+
+// FormateDate formats a date to dd/mm/yyyy
+func FormatDate(t time.Time, f string) string {
+	return t.Format(f)
+}
+
+// Iterate is a function that returns a slice of integers
+func Iterate(count int) []int {
+	var i int
+	var items []int
+	for i = 0; i < count; i++ {
+		items = append(items, i)
+	}
+	return items
 }
