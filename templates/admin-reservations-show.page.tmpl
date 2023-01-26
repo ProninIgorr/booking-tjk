@@ -1,5 +1,6 @@
 {{template "admin" .}}
 
+
 {{define "page-title"}}
     Бронирования
 {{end}}
@@ -49,10 +50,59 @@
                 </div>
 
                 <hr>
-
+                 <div class="float-left">
                 <input type="submit" value="Сохранить" class="btn btn-primary">
+                {{if eq $src "cal"}}
+                <a href="#!" onclick="window.history.go(-1)" class="btn btn-warning">Отменить</a>
+                {{else}}
+            
                 <a href="/admin/reservations-{{$src}}" class="btn btn-warning">Отменить</a>
+                {{end}}
+                <a href="#!" class="btn btn-info" onclick="processRes({{$res.ID}})">Обработать</a>
+                </div>
+
+                <div class="float-right mt-3">
+
+                <a href="#!" class="btn btn-danger" onclick="deleteRes({{$res.ID}})">Удалить</a>
+                </div>
+                <div class="clearfix"></div>
+
 
         </form>
     </div>
 {{end}}
+
+{{define "js" }}
+{{$src := index .StringMap "src"}}
+    <script>
+        function processRes(id) {
+        attention.custom({
+        icon: 'warning'
+        msg: 'Вы уверены?'
+        callback: function(result) {
+        if (result !== false) {
+        window.location.href = "/admin/process-reservation/{{$src}}/" + id;
+        }
+        }
+        })
+        }
+
+        function deleteRes(id) {
+        attention.custom({
+        icon: 'warning'
+        msg: 'Вы уверены?'
+        callback: function(result) {
+        if (result !== false) {
+        window.location.href = "/admin/delete-reservation/{{$src}}/" + id;
+        }
+        }
+        })
+        }
+
+         
+    </script>
+{{end}}
+
+
+    
+    
