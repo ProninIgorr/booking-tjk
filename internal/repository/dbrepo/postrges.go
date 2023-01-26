@@ -2,6 +2,7 @@ package dbrepo
 
 import (
 	"context"
+	"log"
 	"time"
 
 	"github.com/ProninIgorr/booking-tjk/internal/models"
@@ -288,4 +289,144 @@ func (m *postgresDBRepo) GetReservationByID(id int) (models.Reservation, error) 
 	}
 
 	return reservation, nil
+}
+
+// UpdateReservation updates a reservation in the database
+func (m *postgresDBRepo) UpdateReservation(r models.Reservation) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `update reservations set first_name = $1, last_name = $2, email = $3, phone = $4, updated_at = $5 where id = $6`
+
+	_, err := m.DB.ExecContext(ctx, query, r.FirstName, r.LastName, r.Email, r.Phone, time.Now(), r.ID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// DeleteReservation deletes a reservation by ID
+func (m *postgresDBRepo) DeleteReservation(id int) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `delete from reservations where id = $1`
+
+	_, err := m.DB.ExecContext(ctx, query, id)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// UpdateProcessedForReservation updates the processed for a reservation by ID
+func (m *postgresDBRepo) UpdateProcessedForReservation(id, processed int) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `update reservations set processed = $1, updated_at = $2 where id = $3`
+
+	_, err := m.DB.ExecContext(ctx, query, processed, time.Now(), id)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// AllRooms returns a slice of all rooms
+func (m *postgresDBRepo) AllRooms() ([]models.Room, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	var rooms []models.Room
+
+	query := `select id, room_name, created_at, updated_at from rooms order by room_name`
+
+	rows, err := m.DB.QueryContext(ctx, query)
+	if err != nil {
+		return rooms, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var i models.Room
+		err := rows.Scan(&i.ID, &i.RoomName, &i.CreatedAt, &i.UpdatedAt)
+		if err != nil {
+			return rooms, err
+		}
+		rooms = append(rooms, i)
+	}
+
+	if err = rows.Err(); err != nil {
+		return rooms, err
+	}
+
+	return rooms, nil
+}
+
+// GetRestrictionsForRoomByDate returns restrictions for room by date range
+func (m *postgresDBRepo) GetRestrictionsForRoomByDate(roomID int, start, end time.Time) ([]models.RoomRestriction, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	var restrictions []models.RoomRestriction
+
+	query := `select id, coalesce(reservation_id, 0), restriction_id, room_id, start_date, end_date from room_restrictions where $1 < end_date and $2 >= start_date and room_id = $3`
+
+	rows, err := m.DB.QueryContext(ctx, query, start, end, roomID)
+	if err != nil {
+		return restrictions, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var i models.RoomRestriction
+		err := rows.Scan(&i.ID, &i.ReservationID, &i.RestrictionID, &i.RoomID, &i.StartDate, &i.EndDate)
+		if err != nil {
+			return restrictions, err
+		}
+		restrictions = append(restrictions, i)
+	}
+
+	if err = rows.Err(); err != nil {
+		return restrictions, err
+	}
+
+	return restrictions, nil
+}
+
+// InsertBlockForRoom inserts a room restriction
+func (m *postgresDBRepo) InsertBlockForRoom(id int, startDate time.Time) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `insert into room_restrictions (start_date, end_date, room_id, restriction_id, created_at, updated_at)
+	values ($1, $2, $3, $4, $5, $6)`
+
+	_, err := m.DB.ExecContext(ctx, query, startDate, startDate.AddDate(0, 0, 1), id, 2, time.Now(), time.Now())
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+
+	return nil
+}
+
+// DeleteBlockByID deletes a room restriction by ID
+func (m *postgresDBRepo) DeleteBlockByID(id int) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `delete from room_restrictions where id = $1`
+
+	_, err := m.DB.ExecContext(ctx, query, id)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+
+	return nil
 }
